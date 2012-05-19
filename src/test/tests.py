@@ -23,3 +23,6 @@ class TestTimeCop(unittest.TestCase):
         with TimeCop(0):
             self.assertEqual(date(1969, 12, 31), date.today())
 
+    # TODO: test more of datetime and time modules' API
+    # TODO: impl (ruby) timecop features like "revert to past but allow time to resume normally from that point"
+
