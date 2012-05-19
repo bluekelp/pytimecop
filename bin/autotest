@@ -1,0 +1,168 @@
+#!/bin/bash
+
+# TODO rewrite this mess in python or something
+#      bash is difficult (for me) to write largish complex things in
+
+#series=('\' '|' '/' '-')
+#series=('.' 'o' 'O' '*' 'O' 'o')
+series=(
+    '[*    ]'
+    '[ *   ]'
+    '[  *  ]'
+    '[   * ]'
+    '[    *]'
+    '[   * ]'
+    '[  *  ]'
+    '[ *   ]'
+)
+
+# vars for animation
+t=0
+len=${#series[@]}
+
+# command to run to do tests
+cmd="make test"
+
+# color codes
+color=
+color_fail='\e[1;37;41m'
+color_errors='\e[0;30;43m'
+color_syntax='\e[0;5;30;41m'
+#color_pass='\e[0;30;42m\e[K'
+color_pass='\e[0;30;42m'
+color_reset='\e[0m'
+color_testing='\e[0;37;45m'
+
+# ensure file exists but likely older than a file in cwd
+touch --date='1970-01-01' .ci_sentinel
+
+# intitial time since last pass
+date +%s > .ci_last_pass
+
+# initial messages
+msg='<....>'
+last_pass='<computing>'
+
+# false, last run did not pass
+# used to determine when to update time since last pass
+last_run_passed=0
+
+# columns, gotten from stty
+cols_raw="$(stty size | awk '{print $2}')"
+
+# adjust for animation size, msg size, etc.
+cols=$(( $cols_raw-13 ))
+
+while :
+do
+    # print animation step - NB %b required for color codes in \e form
+    #   the %-((...))s math below is to account for length of $msg so
+    #   background colors like those on syntax errors don't persist
+    #   past time that msg is displayed and a change to "pass" will
+    #   fully reset and wipe old colors from line
+    #
+    #   otherwise a few red bars/etc might persist even if tests pass
+    #   if they were previously failed and that contition showed a
+    #   background color
+    printf "\r%b%s [%-6s] %-$(($cols-${#msg}))s%b" "$color" "${series[$t]}" "$msg" "$last_pass" "$color_reset"
+
+    # forward animation to next step
+    t=$(expr $t + 1)
+    t=$(expr $t % $len )
+
+    # pause to keep animation from going too fast
+    #   don't make this too long or latency between
+    #   file write and tests running will increase
+    sleep 0.5
+
+    # last pass check and compute "time since last passing test"
+    if [ 1 == $last_run_passed ]
+    then
+        last_pass=''
+    else
+        # NB there is a "bug" as follows:
+        #   tests pass, .ci_last_pass set
+        #   N minutes go by while you edit
+        #   you write file, test fail
+        #   time reported since last pass = N minutes
+        #   (even though they just failed)
+        #
+        #   this is desired behavior since tests
+        #   have actually not been proven to pass
+        #   in N minutes -- prompting devs to keep
+        #   cycle short and time between passes
+        #   smaller.
+        #
+        #   also, we don't know when in those N
+        #   minutes the error was introduced, so
+        #   err on side of "more"
+        mins="-1"
+        last="$(cat .ci_last_pass)"
+        now="$(date +%s)"
+        secs=$(( $now-$last ))
+        mins=$(( $secs/60 ))
+        last_pass="Last pass: ${mins}m ago"
+    fi
+
+    # look for newly changed files -- trigger tests if output contains >0 lines (files that changed)
+    if [ "0" -ne "$(find . -not -path '.*.swp' -not -path '*.pyc' -newer .ci_sentinel -type f | wcl)" ]
+    then
+        # notify running tests - use current color
+        color=$color_testing
+        printf "\r%b%-${cols_raw}s" "$color" "[...running tests...]"
+
+        # run tests
+        MM="$( $cmd 2>&1)"
+
+        # check return code
+        if [ $? == 0 ]
+        then
+            # passed tests, update vars and continue
+            color=$color_pass
+            msg='PASS'
+
+            # update last time tests passed
+            echo "$(date +%s)" > .ci_last_pass
+            last_pass=''
+            last_run_passed=1
+        else
+            # tests failed
+
+            last_run_passed=0
+
+            # look for various strings to determine cause of failures
+            num_failures=$(echo "$MM" | egrep 'failures=[1-9]' | sed -r -e 's/.*failures=([0-9]+).*/\1/')
+            num_errors=$(echo "$MM"   | egrep 'errors=[1-9]'   | sed -r -e 's/.*errors=([0-9]+).*/\1/')
+
+            # special check for syntax failures
+            syntax_errors=$(echo "$MM" | grep ^SyntaxError:)
+            if [ 0 == $? ]
+            then
+                syntax_errors=1
+            else
+                syntax_errors=0
+            fi
+
+            # from "most" to "least" surprising cause
+            if [  "1" == "$syntax_errors" ]
+            then
+                # syntax/compile error
+                color=$color_syntax
+                msg='SYNTAX'
+            elif [ "" != "$num_errors" ]
+            then
+                # unexpected exception/error from test
+                color=$color_errors
+                msg='ERROR'
+            else
+                # test/assertion failure
+                color=$color_fail
+                msg='FAIL'
+            fi
+        fi
+
+        # update sentinel time so skip test run until next file updated
+        touch .ci_sentinel
+    fi
+done
+

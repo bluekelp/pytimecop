@@ -1,0 +1,8 @@
+#!/bin/bash
+
+# special version of pip that silences notices that a requirement is already satisfied
+# -- so we can run "make depends" often and not get a lot of cruft on stdout
+
+RVAL=0
+{ pip $@; RVAL=$?; } | grep -v '^Requirement already satisfied' | grep -v '^Cleaning up...'
+exit $RVAL  # return same return value that pip did, not the greps in the chain

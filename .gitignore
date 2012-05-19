@@ -1,0 +1,15 @@
+# vim swap files
+.*.swp
+
+# python compilation cruft
+*.pyc
+
+# our virtualenv (NB: location can differ it set in Makefile)
+.pyenv
+
+## CI timestamp files
+# time last tests passed
+.ci_last_pass
+# sentinel to check for new file writes against
+.ci_sentinel
+
