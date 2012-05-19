@@ -1,6 +1,6 @@
 import time
 
-class PyTimeCop(object):
+class TimeCop(object):
     "A manipulable time.time() replacement"
 
     def __init__(self, secs):
