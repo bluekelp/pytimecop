@@ -11,25 +11,28 @@ PYENV=.pyenv
 # custom pip script ignores/filters "already installed, use --upgrade" and "cleaning up" msgs
 PIP=$(BIN)/pip_
 
-PROJECT_NAME=ppk
+PROJECT_NAME=pytimecop
 
 # project abbreviated name
-PROJECT_ABBREV=$(PROJECT_NAME)
+PROJECT_ABBREV="ptc"
 
+NOSE_FLAGS="--nocapture"
+
+
+##########
 # - initial "default" rule
 # will be used it you just type "make" on the cmdline
+.PHONY: all
+all: install clean
+# I like to cleanup Python projects after every run
 
+# Includes need to be below the default "all" command or rules defined
+# in them will be interpreted as the default/first rule
 
 ##########
 # keep VAR assignments above so can be overridden by users
 
 -include inc/*.mk
-
-##########
-
-.PHONY: all
-all: install clean
-# I like to cleanup Python projects after every run
 
 # I like to cleanup Python projects after every run
 .PHONY: install
@@ -49,7 +52,7 @@ autotest:
 
 .PHONY: test
 test: compile
-	@nosetests $(SRC)/test
+	@nosetests $(SRC)/test $(NOSE_FLAGS)
 
 .PHONY: deploy
 # TBD put code up somewhere, etc

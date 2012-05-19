@@ -13,3 +13,5 @@
 # sentinel to check for new file writes against
 .ci_sentinel
 
+# I don't consider this part of my project
+bin/virtualenv.py
