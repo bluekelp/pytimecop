@@ -5,9 +5,6 @@
 SRC=src
 BIN=bin
 
-# Python virtualenv location
-PYENV=.pyenv
-
 # custom pip script ignores/filters "already installed, use --upgrade" and "cleaning up" msgs
 PIP=$(BIN)/pip_
 
