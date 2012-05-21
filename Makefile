@@ -49,7 +49,7 @@ autotest:
 
 .PHONY: test
 test: compile
-	@nosetests $(SRC)/test $(NOSE_FLAGS)
+	@nosetests $(SRC)/tests $(NOSE_FLAGS)
 
 .PHONY: deploy
 # TBD put code up somewhere, etc
