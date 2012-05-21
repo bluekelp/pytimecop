@@ -5,7 +5,7 @@ from datetime import date
 from datetime import timedelta
 import time
 
-from pytimecop import TimeCop
+import timecop
 
 class TestTimeCop(unittest.TestCase):
 
@@ -16,11 +16,11 @@ class TestTimeCop(unittest.TestCase):
         # do it "right"
         yesterday = date.today() - timedelta(days=1)
 
-        with TimeCop(secs):
+        with timecop.freeze(secs):
             self.assertEqual(yesterday, date.today())
 
     def test_epoch(self):
-        with TimeCop(0):
+        with timecop.freeze(0):
             self.assertEqual(date(1969, 12, 31), date.today())
 
     # TODO: test more of datetime and time modules' API
