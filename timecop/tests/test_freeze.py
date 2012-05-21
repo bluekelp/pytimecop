@@ -7,7 +7,7 @@ import time
 
 import timecop
 
-class TestTimeCopFreeze(unittest.TestCase):
+class TestFreeze(unittest.TestCase):
 
     def test_yesterday(self):
         secs = time.time()
@@ -21,6 +21,7 @@ class TestTimeCopFreeze(unittest.TestCase):
 
     def test_epoch(self):
         with timecop.freeze(0):
+            # test assumes knowledge of when epoch is but that's ok
             self.assertEqual(date(1969, 12, 31), date.today())
 
     def test_time_stops_with_freeze(self):

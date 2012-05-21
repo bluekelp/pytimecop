@@ -1,7 +1,7 @@
 import time
 
 class freeze(object):
-    "A manipulable time.time() replacement"
+    """ Context to freeze time at a given point in time """
 
     def __init__(self, secs):
         """ Initialize ourselves to be a context for the given alternate time. """
