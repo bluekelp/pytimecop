@@ -7,7 +7,9 @@ setup(name='timecop',
       version=version,
       description="Enables time travel. A port of Ruby's gem of the same name.",
       long_description="""\
-Enables time travel. A port of Ruby's gem of the same name.
+Enables time travel.
+A port of the Ruby gem of the same name: https://github.com/jtrupiano/timecop.
+
 Currently supports "freeze" but not "travel" functionality, specified by either\
 a "time since epoch" or datetime.timedelta specification.""",
       classifiers=[
