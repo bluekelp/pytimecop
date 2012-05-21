@@ -7,7 +7,7 @@ import time
 
 import timecop
 
-class TestTimeCop(unittest.TestCase):
+class TestTimeCopFreeze(unittest.TestCase):
 
     def test_yesterday(self):
         secs = time.time()
@@ -23,6 +23,14 @@ class TestTimeCop(unittest.TestCase):
         with timecop.freeze(0):
             self.assertEqual(date(1969, 12, 31), date.today())
 
-    # TODO: test more of datetime and time modules' API
-    # TODO: impl (ruby) timecop features like "revert to past but allow time to resume normally from that point"
+    def test_time_stops_with_freeze(self):
+        now = time.time() 
+
+        with timecop.freeze(now):
+            # >1.0 in case time.time()'s resolution isn't so good/etc
+            # NB: time.sleep() and time.time() resolution should be plenty to detect
+            # a sleep even of a few milliseconds but we're trading test run time for 
+            # confidence time is frozen
+            time.sleep(1.5)
+            self.assertEqual(now, time.time())  # time ought not to have changed at all
 
