@@ -1,11 +1,15 @@
 import time
+import datetime
 
 class freeze(object):
     """ Context to freeze time at a given point in time """
 
-    def __init__(self, secs):
+    def __init__(self, time_spec):
         """ Initialize ourselves to be a context for the given alternate time. """
-        self.secs_ = float(secs)
+        if isinstance(time_spec, datetime.timedelta):
+            self.secs_ = time.time() + time_spec.total_seconds()
+        else:
+            self.secs_ = float(time_spec)
 
     def time_(self):
         """ A version of time.time() that will return the value we want

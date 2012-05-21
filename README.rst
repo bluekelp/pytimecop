@@ -14,10 +14,11 @@ Needs more testing, needs docs.
 Current functionality
 ---------------------
 #. timecop.freeze() supporting floating point/int "seconds since epoch" time specs
+#. timecop.freeze() supporting timedelta time specs (use negative numbers to go back)
 
 ----
 TODO
 ----
-#. accept timedelta(), date(), and string representations of alternate times
+#. accept date(), and string representations of alternate times
 #. timecop.travel() functionality
 #. test full suite of datetime, time, objects for proper functionality
