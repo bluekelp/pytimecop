@@ -2,7 +2,7 @@
 ##########
 # defaults
 
-SRC=src
+SRC=timecop
 BIN=bin
 
 # custom pip script ignores/filters "already installed, use --upgrade" and "cleaning up" msgs
