@@ -15,7 +15,7 @@ class TestTravel(unittest.TestCase):
 
         with timecop.travel(now):
             # NB: time.sleep() and time.time() resolution should be plenty to detect
-            # a sleep even of a few milliseconds but we're trading test run time for 
+            # a sleep even of a few milliseconds but we're trading test run time for
             # confidence that time is really frozen
             sleep_secs = 0.6
             time.sleep(sleep_secs)
