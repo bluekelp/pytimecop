@@ -15,10 +15,12 @@ Current functionality
 ---------------------
 #. timecop.freeze() supporting floating point/int "seconds since epoch" time specs
 #. timecop.freeze() supporting timedelta time specs (use negative numbers to go back)
+#. timecop.travel() supports all creation/use methods a freeze()
 
 ----
 TODO
 ----
 #. accept date(), and string representations of alternate times
-#. timecop.travel() functionality
 #. test full suite of datetime, time, objects for proper functionality
+#. support older (pre 2.7.2?) versions of python - datetime.total_seconds() appears to not be supported in some older versions
+

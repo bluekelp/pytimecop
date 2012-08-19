@@ -33,3 +33,16 @@ class freeze(object):
         time.time = self.old_time_func_  # reset old
         del(self.old_time_func_)  # forget it
 
+    def actual_time_(self):
+        return self.old_time_func_()
+
+class travel(freeze):
+    """ Context to travel to another time, letting time continue to pass """
+    def __init__(self, time_spec):
+        freeze.__init__(self, time_spec)
+        # at this point, time.time() *is* actual time
+        self.time_travel_offset_ = self.secs_ - time.time() # amount of time (in seconds) we're travelling in future (positive values) or past (negative value)
+
+    def time_(self):
+        return self.actual_time_() + self.time_travel_offset_
+
