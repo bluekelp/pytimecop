@@ -1,9 +1,9 @@
 
 import unittest
 
+import datetime
 from datetime import date
 from datetime import timedelta
-from datetime import datetime
 import time
 
 import timecop
@@ -60,3 +60,26 @@ class TestFreeze(unittest.TestCase):
             # test again after coming out of looped context
             self.assertEqual(yesterday, date.today())
 
+    def test_datetime_today(self):
+        now = time.time()
+
+        with timecop.freeze(now):
+            time.sleep(0.6)
+            self.assertEqual(datetime.datetime.fromtimestamp(now),
+                             datetime.datetime.today())
+
+    def test_datetime_now(self):
+        now = time.time()
+
+        with timecop.freeze(now):
+            time.sleep(0.6)
+            self.assertEqual(datetime.datetime.fromtimestamp(now),
+                             datetime.datetime.now())
+
+    def test_datetime_utcnow(self):
+        now = time.time()
+
+        with timecop.freeze(now):
+            time.sleep(0.6)
+            self.assertEqual(datetime.datetime.utcfromtimestamp(now),
+                             datetime.datetime.utcnow())

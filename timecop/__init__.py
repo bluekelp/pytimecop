@@ -1,6 +1,26 @@
 import time
 import datetime
 
+class fake_datetime(datetime.datetime):
+    """Like datetime.datetime, but always defer to time.time()
+
+    These implementations of now and utcnow are lifted straight from
+    the standard library documentation, which states that they are
+    "equivalent" to these expressions, but may provide higher
+    resolution on systems which support it.
+
+    """
+    @classmethod
+    def now(cls, tz=None):
+        if tz is None:
+            return cls.fromtimestamp(time.time())
+        else:
+            return tz.fromutc(cls.utcnow().replace(tzinfo=tz))
+
+    @classmethod
+    def utcnow(cls):
+        return cls.utcfromtimestamp(time.time())
+
 class freeze(object):
     """ Context to freeze time at a given point in time """
 
@@ -25,6 +45,10 @@ class freeze(object):
             # for another nested context
             raise ValueError('cannot nest time travel with the same instance')
 
+        # replace datetime.datetime
+        self.old_datetime_ = datetime.datetime
+        datetime.datetime = fake_datetime
+
         self.old_time_func_ = time.time  # save old
         time.time = self.time_  # set new
 
@@ -32,6 +56,10 @@ class freeze(object):
         """ Reset time.time() to the value when we found it. """
         time.time = self.old_time_func_  # reset old
         del(self.old_time_func_)  # forget it
+
+        # restore datetime.datetime
+        datetime.datetime = self.old_datetime_
+        del(self.old_datetime_)
 
     def actual_time_(self):
         return self.old_time_func_()
